@@ -5,7 +5,21 @@ import java.net.*;
 import java.util.*;
 
 public class Main {
+    private static final String DUMP_FILE = "dump.myrdb";
+
     public static void main(String[] args) throws IOException {
+        Store.load(DUMP_FILE);
+        System.out.println("Loaded data from " + DUMP_FILE + " (if it existed)");
+
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            try {
+                Store.save(DUMP_FILE);
+                System.out.println("Saved data to " + DUMP_FILE + " on shutdown");
+            } catch (IOException e) {
+                System.out.println("Failed to save on shutdown: " + e.getMessage());
+            }
+        }));
+
         int port = 6379;
         ServerSocket serverSocket = new ServerSocket(port);
         serverSocket.setReuseAddress(true);

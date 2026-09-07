@@ -83,6 +83,30 @@ public class CommandDispatcher {
                 if (command.size() < 2) RespWriter.writeError(out, "wrong number of arguments for 'hlen'");
                 else RespWriter.writeInteger(out, Store.hlen(command.get(1)));
             }
+            case "SADD" -> {
+                if (command.size() < 3) RespWriter.writeError(out, "wrong number of arguments for 'sadd'");
+                else RespWriter.writeInteger(out, Store.sadd(command.get(1), command.get(2)));
+            }
+            case "SREM" -> {
+                if (command.size() < 3) RespWriter.writeError(out, "wrong number of arguments for 'srem'");
+                else RespWriter.writeInteger(out, Store.srem(command.get(1), command.get(2)));
+            }
+            case "SISMEMBER" -> {
+                if (command.size() < 3) RespWriter.writeError(out, "wrong number of arguments for 'sismember'");
+                else RespWriter.writeInteger(out, Store.sismember(command.get(1), command.get(2)) ? 1 : 0);
+            }
+            case "SMEMBERS" -> {
+                if (command.size() < 2) RespWriter.writeError(out, "wrong number of arguments for 'smembers'");
+                else RespWriter.writeArray(out, Store.smembers(command.get(1)));
+            }
+            case "SCARD" -> {
+                if (command.size() < 2) RespWriter.writeError(out, "wrong number of arguments for 'scard'");
+                else RespWriter.writeInteger(out, Store.scard(command.get(1)));
+            }
+            case "SAVE" -> {
+                Store.save("dump.myrdb");
+                RespWriter.writeSimpleString(out, "OK");
+            }
             default -> RespWriter.writeError(out, "unknown command '" + cmd + "'");
         }
     }
