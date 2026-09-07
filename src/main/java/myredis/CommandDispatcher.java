@@ -62,6 +62,53 @@ public class CommandDispatcher {
                     RespWriter.writeInteger(out, ttl);
                 }
             }
+            case "LPUSH" -> {
+                if (command.size() < 3) {
+                    RespWriter.writeError(out, "wrong number of arguments for 'lpush'");
+                } else {
+                    long len = Store.lpush(command.get(1), command.get(2));
+                    RespWriter.writeInteger(out, len);
+                }
+            }
+            case "RPUSH" -> {
+                if (command.size() < 3) {
+                    RespWriter.writeError(out, "wrong number of arguments for 'rpush'");
+                } else {
+                    long len = Store.rpush(command.get(1), command.get(2));
+                    RespWriter.writeInteger(out, len);
+                }
+            }
+            case "LPOP" -> {
+                if (command.size() < 2) {
+                    RespWriter.writeError(out, "wrong number of arguments for 'lpop'");
+                } else {
+                    RespWriter.writeBulkString(out, Store.lpop(command.get(1)));
+                }
+            }
+            case "RPOP" -> {
+                if (command.size() < 2) {
+                    RespWriter.writeError(out, "wrong number of arguments for 'rpop'");
+                } else {
+                    RespWriter.writeBulkString(out, Store.rpop(command.get(1)));
+                }
+            }
+            case "LLEN" -> {
+                if (command.size() < 2) {
+                    RespWriter.writeError(out, "wrong number of arguments for 'llen'");
+                } else {
+                    RespWriter.writeInteger(out, Store.llen(command.get(1)));
+                }
+            }
+            case "LRANGE" -> {
+                if (command.size() < 4) {
+                    RespWriter.writeError(out, "wrong number of arguments for 'lrange'");
+                } else {
+                    int start = Integer.parseInt(command.get(2));
+                    int stop = Integer.parseInt(command.get(3));
+                    List<String> result = Store.lrange(command.get(1), start, stop);
+                    RespWriter.writeArray(out, result);
+                }
+            }
             default -> RespWriter.writeError(out, "unknown command '" + cmd + "'");
         }
     }
@@ -76,7 +123,6 @@ public class CommandDispatcher {
         String value = command.get(2);
         long ttlMillis = -1;
 
-        // look for EX/PX options: SET key value EX 10  or  SET key value PX 10000
         for (int i = 3; i < command.size() - 1; i++) {
             String opt = command.get(i).toUpperCase();
             if (opt.equals("EX")) {

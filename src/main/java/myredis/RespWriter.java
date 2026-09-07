@@ -1,6 +1,7 @@
 package myredis;
 
 import java.io.*;
+import java.util.*;
 
 public class RespWriter {
 
@@ -25,5 +26,12 @@ public class RespWriter {
         out.write(("$" + data.length + "\r\n").getBytes());
         out.write(data);
         out.write("\r\n".getBytes());
+    }
+
+    public static void writeArray(OutputStream out, List<String> items) throws IOException {
+        out.write(("*" + items.size() + "\r\n").getBytes());
+        for (String item : items) {
+            writeBulkString(out, item);
+        }
     }
 }
